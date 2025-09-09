@@ -1,0 +1,43 @@
+export type Username = string;
+
+export type User = {
+  username: Username;
+  passwordHash: string;
+  createdAt: string;
+};
+
+export type AddressInput = { postcode: string; suburb: string; state: string };
+export type AddressValidation = {
+  ok: boolean;
+  message: string;
+  latLng?: { lat: number; lng: number };
+};
+
+export interface UserRepository {
+  findByUsername(username: Username): Promise<User | null>;
+  create(user: User): Promise<void>;
+}
+
+export interface VerificationLogRepository {
+  log(entry: {
+    username: Username;
+    input: AddressInput;
+    result: "success" | "failure";
+    error?: string;
+    ts: string;
+  }): Promise<void>;
+}
+
+export interface AddressValidator {
+  validate(input: AddressInput): Promise<AddressValidation>;
+}
+
+export interface PasswordHasher {
+  hash(raw: string): Promise<string>;
+  verify(raw: string, hash: string): Promise<boolean>;
+}
+
+export interface SessionIssuer {
+  issue(username: Username): Promise<string>; // returns token
+  verify(token: string): Promise<{ username: Username } | null>;
+}

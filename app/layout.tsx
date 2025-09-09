@@ -1,4 +1,4 @@
-import "../src/app/globals.css";
+import "./globals.css";
 import ApolloClientProvider from "../lib/apollo";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
