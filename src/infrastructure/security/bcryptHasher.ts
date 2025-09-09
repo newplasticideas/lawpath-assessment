@@ -1,16 +1,13 @@
-import bcrypt from "bcrypt";
-import { PasswordHasher } from "../../core/ports";
+// infrastructure/security/bcryptHasher.ts
+import bcrypt from "bcryptjs";
 
-/**
- * Production-ready bcrypt implementation of PasswordHasher.
- */
-export function bcryptHasher(rounds = 10): PasswordHasher {
+export function bcryptHasher() {
   return {
-    async hash(raw: string): Promise<string> {
-      return bcrypt.hash(raw, rounds);
+    hash(password: string) {
+      return bcrypt.hash(password, 10);
     },
-    async verify(raw: string, hash: string): Promise<boolean> {
-      return bcrypt.compare(raw, hash);
+    verify(password: string, passwordHash: string) {
+      return bcrypt.compare(password, passwordHash);
     },
   };
 }

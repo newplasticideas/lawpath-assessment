@@ -1,4 +1,8 @@
-import { AddressInput, AddressValidation, AddressValidator } from "../../core/ports";
+import {
+  AddressInput,
+  AddressValidation,
+  AddressValidator,
+} from "../../core/ports";
 
 /**
  * In-memory address validator (production-safe stub).
@@ -14,7 +18,11 @@ import { AddressInput, AddressValidation, AddressValidator } from "../../core/po
  */
 export function memoryAddressValidator(): AddressValidator {
   return {
-    async validate({ postcode, suburb, state }: AddressInput): Promise<AddressValidation> {
+    async validate({
+      postcode,
+      suburb,
+      state,
+    }: AddressInput): Promise<AddressValidation> {
       // 1. Postcode check
       if (!/^\d{4}$/.test(postcode)) {
         return { ok: false, message: "Postcode must be 4 digits." };
@@ -32,7 +40,11 @@ export function memoryAddressValidator(): AddressValidator {
       }
 
       // 4. Default: valid (no external checks here)
-      return { ok: true, message: "The postcode, suburb, and state input are structurally valid." };
+      return {
+        ok: true,
+        message:
+          "The postcode, suburb, and state input are structurally valid.",
+      };
     },
   };
 }

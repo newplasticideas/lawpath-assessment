@@ -1,20 +1,23 @@
-import { NextRequest, NextResponse } from "next/server";
-
-const PROTECTED = ["/verifier"]; // add more later
+// middleware.ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  if (PROTECTED.some(p => pathname.startsWith(p))) {
-    const token = req.cookies.get("auth")?.value;
-    if (!token) {
-      const url = new URL("/login", req.url);
-      url.searchParams.set("next", pathname);
-      return NextResponse.redirect(url);
-    }
+  const token = req.cookies.get("lp_sess")?.value;
+
+  // protect /verifier
+  if (pathname.startsWith("/verifier")) {
+    if (!token) return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.next();
   }
+
+  // redirect logged-in users away from /login or /register
+  if ((pathname === "/login" || pathname === "/register") && token) {
+    return NextResponse.redirect(new URL("/verifier", req.url));
+  }
+
   return NextResponse.next();
 }
 
-export const config = {
-  matcher: ["/verifier", "/verifier/:path*"],
-};
+export const config = { matcher: ["/verifier/:path*", "/login", "/register"] };

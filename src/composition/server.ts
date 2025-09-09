@@ -6,22 +6,42 @@ import { makeVerifyAddress } from "../application/verifyAddress";
 import { bcryptHasher } from "../infrastructure/security/bcryptHasher";
 import { jwtSession } from "../infrastructure/security/jwtSession";
 
-// In-memory adapters
-import { memoryUserRepository } from "../infrastructure/memory/userRepository";
-import { memoryVerificationLogRepository } from "../infrastructure/memory/verificationLogRepository";
-import { memoryAddressValidator } from "../infrastructure/memory/addressValidator";
+// adapters (Elasticsearch + AusPost)
+import { esUserRepository } from "../infrastructure/es/userRepository";
+import { esVerificationLogRepository } from "../infrastructure/es/verificationLogRepository";
+import { makeAusPostRestAdapter } from "../infrastructure/auspost/restAdapter";
 
 export function buildServerServices() {
+  const first = "nick";
+  const last = "johnson";
+  const USERS_INDEX = `${first}-${last}-users`;
+  const VERIF_PREFIX = `${first}-${last}-verifications`;
+
+  const users = esUserRepository({
+    node: process.env.ELASTICSEARCH_NODE!,
+    apiKey: process.env.ELASTICSEARCH_API_KEY!,
+    index: USERS_INDEX,
+  });
+
+  const logs = esVerificationLogRepository({
+    node: process.env.ELASTICSEARCH_NODE!,
+    apiKey: process.env.ELASTICSEARCH_API_KEY!,
+    prefix: VERIF_PREFIX,
+  });
+
+  const validator = makeAusPostRestAdapter({
+    baseUrl: process.env.AUSPOST_BASE_URL!,
+    apiKey: process.env.AUSPOST_API_KEY!,
+  });
+
   const secret = process.env.JWT_SECRET || "dev-secret-change-me";
   const session = jwtSession(secret);
   const hasher = bcryptHasher();
 
-  const users = memoryUserRepository();
-  const logs = memoryVerificationLogRepository();
-  const validator = memoryAddressValidator();
-
   return {
     session,
+    hasher,
+    users,
     usecases: {
       register: makeRegister({ users, hasher, session }),
       login: makeLogin({ users, hasher, session }),

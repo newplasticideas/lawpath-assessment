@@ -1,11 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
-// Day 1: accept anything non-empty; Day 2: verify bcrypt + ES lookup + real JWT
-export async function POST(req: NextRequest) {
-  const { username, password } = await req.json();
-  if (!username || !password) return NextResponse.json({ error: "Missing" }, { status: 400 });
+import { NextResponse } from "next/server";
+import { buildServerServices } from "@/src/composition/server";
 
-  // Set a temporary cookie to satisfy middleware (replace with signed JWT Day 2)
+export async function POST(req: Request) {
+  const { username, password } = await req.json();
+  const { usecases } = buildServerServices();
+
+  const result = await usecases.login({ username, password });
+  if (!result.ok)
+    return NextResponse.json({ error: result.error }, { status: 401 });
+
   const res = NextResponse.json({ ok: true });
-  res.cookies.set("auth", `stub-${username}`, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
+  res.cookies.set({
+    name: "lp_sess",
+    value: result.token,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
   return res;
 }

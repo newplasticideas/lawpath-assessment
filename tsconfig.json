@@ -21,6 +21,12 @@
     ],
     "paths": { "@/*": ["./*"] }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "__mocks__/@elastic/elasticsearch.js"
+  ],
   "exclude": ["node_modules"]
 }

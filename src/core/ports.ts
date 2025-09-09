@@ -1,6 +1,7 @@
 export type Username = string;
 
 export type User = {
+  id: string;
   username: Username;
   passwordHash: string;
   createdAt: string;
@@ -15,7 +16,7 @@ export type AddressValidation = {
 
 export interface UserRepository {
   findByUsername(username: Username): Promise<User | null>;
-  create(user: User): Promise<void>;
+  create(user: User): Promise<User>;
 }
 
 export interface VerificationLogRepository {
@@ -38,6 +39,7 @@ export interface PasswordHasher {
 }
 
 export interface SessionIssuer {
-  issue(username: Username): Promise<string>; // returns token
-  verify(token: string): Promise<{ username: Username } | null>;
+  issue(username: string): Promise<string>;
+  verify(token: string): Promise<{ username: string } | null>;
+  sign(claims: object, ttlSec?: number): string; // <-- Add this line
 }

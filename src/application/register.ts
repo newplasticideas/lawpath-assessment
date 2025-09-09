@@ -1,40 +1,41 @@
-import { PasswordHasher, SessionIssuer, UserRepository } from "../core/ports";
+import { UserRepository } from "../core/ports";
 
-/**
- * Factory for the register use case.
- * Registers a new user, hashes their password, and issues a session token.
- *
- * @param deps - Dependencies: user repository, password hasher, session issuer
- * @returns Async function to register a user and issue a session token
- */
-export function makeRegister(deps: { users: UserRepository; hasher: PasswordHasher; session: SessionIssuer }) {
-  /**
-   * Registers a new user.
-   * Throws an error if the username is already taken.
-   * Hashes the password and stores the user.
-   * Issues a session token on success.
-   *
-   * @param username - The username to register
-   * @param password - The password to hash and store
-   * @returns An object containing the session token
-   */
-  return async (username: string, password: string) => {
-    // Check if username already exists
-    const exists = await deps.users.findByUsername(username);
-    if (exists) throw new Error("Username already taken");
+type Deps = {
+  users: UserRepository;
+  hasher: { hash(pwd: string): Promise<string> };
+  session: { sign(claims: object, ttlSec?: number): string };
+};
 
-    // Hash the password
-    const passwordHash = await deps.hasher.hash(password);
+export function makeRegister({ users, hasher, session }: Deps) {
+  return async ({
+    username,
+    password,
+  }: {
+    username: string;
+    password: string;
+  }) => {
+    const existing = await users.findByUsername(username);
+    if (existing) {
+      return { ok: false as const, error: "Username taken" };
+    }
 
-    // Store the new user
-    await deps.users.create({
+    const passwordHash = await hasher.hash(password);
+    const user = {
+      id: crypto.randomUUID(),
       username,
-      passwordHash,
+      passwordHash, // <-- only hash stored
       createdAt: new Date().toISOString(),
-    });
+    };
 
-    // Issue session token for the new user
-    const token = await deps.session.issue(username);
-    return { token };
+    await users.create(user); // repo stores user object (no plaintext password!)
+    const token = session.sign(
+      { sub: user.id, username: user.username },
+      60 * 60 * 8,
+    );
+    return {
+      ok: true as const,
+      token,
+      user: { id: user.id, username: user.username },
+    };
   };
 }

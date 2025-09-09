@@ -19,5 +19,9 @@ export function jwtSession(secret: string): SessionIssuer {
         return null;
       }
     },
+
+    sign(claims: object, ttlSec?: number): string {
+      return jwt.sign(claims, secret, { expiresIn: ttlSec ?? 60 * 60 * 8 });
+    },
   };
 }

@@ -2,61 +2,38 @@
 import { Client } from "@elastic/elasticsearch";
 
 async function main() {
-  const client = new Client({ node: process.env.ELASTICSEARCH_NODE || "http://localhost:9200" });
-
-  // Users index (simple)
-  const usersIndex = "users";
-  const usersExists = await client.indices.exists({ index: usersIndex });
-  if (!usersExists) {
-    await client.indices.create({
-      index: usersIndex,
-      mappings: {
-        properties: {
-          username: { type: "keyword" },
-          passwordHash: { type: "keyword" },
-          createdAt: { type: "date" }
-        }
-      }
-    });
-    console.log("Created index:", usersIndex);
-  }
-
-  // Verifications template for verifications-*
-  const templateName = "verifications-template";
-  await client.indices.putIndexTemplate({
-    name: templateName,
-    index_patterns: ["verifications-*"],
-    template: {
-      settings: {
-        number_of_shards: 1,
-        number_of_replicas: 0
-      },
-      mappings: {
-        properties: {
-          username: { type: "keyword" },
-          "input.postcode": { type: "keyword" },
-          "input.suburb": { type: "text", fields: { keyword: { type: "keyword" } } },
-          "input.state": { type: "keyword" },
-          result: { type: "keyword" },
-          error: { type: "text" },
-          ts: { type: "date" }
-        }
-      }
-    }
+  const client = new Client({
+    node: process.env.ELASTICSEARCH_NODE!,
+    auth: { apiKey: process.env.ELASTICSEARCH_API_KEY! },
   });
-  console.log("Upserted index template:", templateName);
 
-  // Ensure current month index exists
-  const now = new Date();
-  const month = `${now.getUTCFullYear()}.${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
-  const verIndex = `verifications-${month}`;
-  const verExists = await client.indices.exists({ index: verIndex });
-  if (!verExists) {
-    await client.indices.create({ index: verIndex });
-    console.log("Created index:", verIndex);
+  const firstname = "Nick";
+  const lastname = "Johnson";
+  const index = `${firstname.toLowerCase()}-${lastname.toLowerCase()}-index`;
+
+  // Ensure index exists first (safe if it already exists)
+  const exists = await client.indices.exists({ index });
+  if (!exists) {
+    await client.indices.create({ index });
+    console.log("Created index:", index);
   }
 
-  console.log("ES setup complete");
+  // Update mapping with "semantic_text" (unknown to TS types)
+  await client.indices.putMapping({
+    index,
+    // The client expects body: { properties: ... } in v8
+    // Cast only the bit TS can't infer:
+    body: {
+      properties: {
+        text: { type: "semantic_text" } as any,
+      },
+    } as any,
+  });
+
+  console.log(`Updated mapping on ${index} (text.semantic_text)`);
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
