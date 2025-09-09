@@ -1,0 +1,39 @@
+# dependencies
+/node_modules
+.pnpm-debug.log*
+yarn.lock
+package-lock.json
+
+# production
+/.next
+/out
+/build
+
+# misc
+.DS_Store
+Thumbs.db
+
+# local env files
+.env
+.env*.local
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# editor junk
+.vscode
+.idea
+*.swp
+*.swo
+
+# typescript
+*.tsbuildinfo
+
+# vercel
+.vercel
+
+# elasticsearch docker data (if you run it
