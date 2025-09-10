@@ -39,10 +39,12 @@ export function makeAusPostRestAdapter(opts: {
     if (state) params.push(`state=${encodeURIComponent(state)}`);
     const query = "?" + params.join("&");
     const data = await call(query);
+    console.log("AusPost API response:", data);
 
     // Defensive check
     const localities = data["data"]["localities"]["locality"];
-    const response = localities.map((locality: any) => ({
+    const localityList = Array.isArray(localities) ? localities : [localities];
+    const response = localityList.map((locality: any) => ({
       suburb: locality["location"],
       state: locality["state"],
     }));
