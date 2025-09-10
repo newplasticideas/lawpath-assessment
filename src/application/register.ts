@@ -23,7 +23,7 @@ export function makeRegister({ users, hasher, session }: Deps) {
     const user = {
       id: crypto.randomUUID(),
       username,
-      passwordHash, // <-- only hash stored
+      passwordHash,
       createdAt: new Date().toISOString(),
     };
 

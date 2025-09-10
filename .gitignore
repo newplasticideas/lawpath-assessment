@@ -38,3 +38,6 @@ yarn-error.log*
 
 # elasticsearch docker data (if you run it
 es-data
+
+# misc
+coverage

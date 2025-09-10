@@ -27,7 +27,7 @@ describe("/api/auth/logout", () => {
 
     const setCookie = res.headers.get("set-cookie") || "";
     // In Next 14+, clearing often uses Max-Age=0 or an Expires date in the past
-    expect(setCookie).toMatch(/lp_sess=/i);
+    expect(setCookie).toMatch(/lp_sess=;/i);
     expect(setCookie).toMatch(/(Max-Age=0|Expires=)/i);
   });
 

@@ -14,8 +14,9 @@ export function makeAusPostRestAdapter(opts: {
   async function call(path: string): Promise<any> {
     const ctrl = new AbortController();
     const id = setTimeout(() => ctrl.abort(), timeout);
+    const url = `${opts.baseUrl}${path}`;
     try {
-      const res = await fetch(`${opts.baseUrl}${path}`, {
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${opts.apiKey}` },
         signal: ctrl.signal,
       });
@@ -32,15 +33,20 @@ export function makeAusPostRestAdapter(opts: {
   // You’ll need to adapt this to the *real* AusPost API response shape
   async function fetchLocalitiesByPostcode(
     postcode: string,
+    state?: string,
   ): Promise<Array<{ suburb: string; state: string }>> {
-    const data = await call(
-      `/localities?postcode=${encodeURIComponent(postcode)}`,
-    );
-    const list = Array.isArray(data?.localities) ? data.localities : [];
-    return list.map((l: any) => ({
-      suburb: String(l.name),
-      state: String(l.state),
+    const params = [`q=${encodeURIComponent(postcode)}`];
+    if (state) params.push(`state=${encodeURIComponent(state)}`);
+    const query = "?" + params.join("&");
+    const data = await call(query);
+
+    // Defensive check
+    const localities = data["data"]["localities"]["locality"];
+    const response = localities.map((locality: any) => ({
+      suburb: locality["location"],
+      state: locality["state"],
     }));
+    return response;
   }
 
   const VALID_STATES = new Set([

@@ -3,8 +3,11 @@ import { graphql } from "graphql";
 import { buildServerServices } from "@/src/composition/server"; // if you didn't set TS path alias, use ../../../../src/composition/server
 import { makeSchema } from "./schema";
 
-async function getCtx(req: NextRequest, verifyToken: (t: string) => Promise<{ username: string } | null>) {
-  const token = req.cookies.get("auth")?.value || "";
+async function getCtx(
+  req: NextRequest,
+  verifyToken: (t: string) => Promise<{ username: string } | null>,
+) {
+  const token = req.cookies.get("lp_sess")?.value || "";
   const session = await verifyToken(token);
   return { username: session?.username };
 }
@@ -13,7 +16,10 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { usecases, session } = buildServerServices();
   const schema = makeSchema(usecases.verifyAddress);
-  const contextValue = await getCtx(req, session.verify);
+  const contextValue = {
+    ...(await getCtx(req, session.verify)),
+    headers: Object.fromEntries(req.headers.entries()),
+  };
   const result = await graphql({
     schema,
     source: body.query,
@@ -29,7 +35,10 @@ export async function GET(req: NextRequest) {
   const variables = JSON.parse(url.searchParams.get("variables") || "{}");
   const { usecases, session } = buildServerServices();
   const schema = makeSchema(usecases.verifyAddress);
-  const contextValue = await getCtx(req, session.verify);
+  const contextValue = {
+    ...(await getCtx(req, session.verify)),
+    headers: Object.fromEntries(req.headers.entries()),
+  };
   const result = await graphql({
     schema,
     source: query,
