@@ -4,18 +4,27 @@ import { useEffect, useState } from "react";
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
 import LogoutButton from "@/components/LogoutButton";
+import { GoogleMapView } from "@/components/GoogleMapView";
 
 const VALIDATE = gql`
   query Validate($postcode: String!, $suburb: String!, $state: String!) {
     validate(postcode: $postcode, suburb: $suburb, state: $state) {
       ok
       message
+      latLng {
+        lat
+        lng
+      }
     }
   }
 `;
 
 type Form = { postcode: string; suburb: string; state: string };
-type ValidateResult = { ok: boolean; message: string };
+type ValidateResult = {
+  ok: boolean;
+  message: string;
+  latLng: { lat: number; lng: number };
+};
 type ValidateQuery = { validate: ValidateResult };
 
 const STORAGE_KEY = "verifierForm";
@@ -92,6 +101,15 @@ export default function VerifierPage() {
           </p>
         )}
       </section>
+      {data?.validate.ok && data.validate?.latLng && (
+        <section className="mt-6">
+          <h3>Location</h3>
+          <GoogleMapView
+            lat={data.validate.latLng.lat}
+            lng={data.validate.latLng.lng}
+          />
+        </section>
+      )}
     </main>
   );
 }

@@ -34,21 +34,45 @@ export function makeAusPostRestAdapter(opts: {
   async function fetchLocalitiesByPostcode(
     postcode: string,
     state?: string,
-  ): Promise<Array<{ suburb: string; state: string }>> {
+  ): Promise<
+    Array<{
+      suburb: string;
+      state: string;
+      latLng: { lat: number; lng: number };
+    }>
+  > {
     const params = [`q=${encodeURIComponent(postcode)}`];
     if (state) params.push(`state=${encodeURIComponent(state)}`);
     const query = "?" + params.join("&");
     const data = await call(query);
-    console.log("AusPost API response:", data);
 
-    // Defensive check
-    const localities = data["data"]["localities"]["locality"];
-    const localityList = Array.isArray(localities) ? localities : [localities];
-    const response = localityList.map((locality: any) => ({
-      suburb: locality["location"],
-      state: locality["state"],
-    }));
-    return response;
+    // Defensive: handle missing, object, or array shapes
+    const localities =
+      data?.data?.localities?.locality ??
+      data?.data?.localities ??
+      data?.localities?.locality ??
+      data?.localities ??
+      [];
+
+    const localityList = Array.isArray(localities)
+      ? localities
+      : localities
+        ? [localities]
+        : [];
+
+    return localityList
+      .map((locality: any) => ({
+        suburb: locality?.location ?? locality?.name ?? "",
+        state: locality?.state ?? "",
+        latLng: {
+          lat: parseFloat(locality?.latitude ?? "0"),
+          lng: parseFloat(locality?.longitude ?? "0"),
+        },
+      }))
+      .filter(
+        (l) =>
+          l.suburb && l.state && !isNaN(l.latLng.lat) && !isNaN(l.latLng.lng),
+      );
   }
 
   const VALID_STATES = new Set([
@@ -84,7 +108,11 @@ export function makeAusPostRestAdapter(opts: {
       const S = state.toUpperCase();
       if (!VALID_STATES.has(S)) return { ok: false, message: "Invalid state." };
 
-      let localities: Array<{ suburb: string; state: string }>;
+      let localities: Array<{
+        suburb: string;
+        state: string;
+        latLng: { lat: number; lng: number };
+      }>;
       try {
         localities = await fetchLocalitiesByPostcode(postcode);
       } catch (e: any) {
@@ -109,7 +137,8 @@ export function makeAusPostRestAdapter(opts: {
 
       return {
         ok: true,
-        message: "The postcode, suburb, and state input are valid.",
+        message: `${postcode}, ${suburb}, in ${state} is a valid match.`,
+        latLng: { lat: match.latLng.lat, lng: match.latLng.lng },
       };
     },
   };
