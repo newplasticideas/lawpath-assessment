@@ -30,7 +30,7 @@ export function makeAusPostGraphQLAdapter(opts: {
       validate(postcode: $postcode, suburb: $suburb, state: $state) {
         ok
         message
-        latLng {
+        coordinates {
           lat
           lng
         }

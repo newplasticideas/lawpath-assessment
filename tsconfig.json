@@ -26,7 +26,11 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "__mocks__/@elastic/elasticsearch.js"
+    "__mocks__/@elastic/elasticsearch.js",
+    "jest.setup.js",
+    "src",
+    "__tests__",
+    "jest.config.js"
   ],
   "exclude": ["node_modules"]
 }

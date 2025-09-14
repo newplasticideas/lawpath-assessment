@@ -1,3 +1,13 @@
+/**
+ * Composes and wires up all core services and use-cases for the server.
+ *
+ * - Configures repositories for users and verification logs (Elasticsearch).
+ * - Sets up security adapters for password hashing and JWT session management.
+ * - Provides an address validator using the AusPost REST API.
+ * - Returns all use-cases (register, login, verifyAddress) with dependencies injected.
+ *
+ * @returns An object containing session, hasher, repositories, and use-cases.
+ */
 import { makeRegister } from "../application/register";
 import { makeLogin } from "../application/login";
 import { makeVerifyAddress } from "../application/verifyAddress";
@@ -11,6 +21,20 @@ import { esUserRepository } from "../infrastructure/es/userRepository";
 import { esVerificationLogRepository } from "../infrastructure/es/verificationLogRepository";
 import { makeAusPostRestAdapter } from "../infrastructure/auspost/restAdapter";
 
+/**
+ * Builds and returns all server-side services and use-cases.
+ *
+ * @returns {{
+ *   session: ReturnType<typeof jwtSession>,
+ *   hasher: ReturnType<typeof bcryptHasher>,
+ *   users: ReturnType<typeof esUserRepository>,
+ *   usecases: {
+ *     register: ReturnType<typeof makeRegister>,
+ *     login: ReturnType<typeof makeLogin>,
+ *     verifyAddress: ReturnType<typeof makeVerifyAddress>
+ *   }
+ * }}
+ */
 export function buildServerServices() {
   const first = "nick";
   const last = "johnson";
@@ -34,8 +58,7 @@ export function buildServerServices() {
     apiKey: process.env.AUSPOST_API_KEY!,
   });
 
-  const secret = process.env.JWT_SECRET || "dev-secret-change-me";
-  const session = jwtSession(secret);
+  const session = jwtSession();
   const hasher = bcryptHasher();
 
   return {

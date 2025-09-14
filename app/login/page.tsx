@@ -1,4 +1,3 @@
-// app/login/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -32,39 +31,36 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto max-w-sm p-6 space-y-3">
-      <h1 className="text-2xl font-semibold">Login</h1>
+    <main>
+      <div className="card">
+        <div className="header">Login</div>
+        <input
+          className="input"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setU(e.target.value)}
+        />
+        <input
+          className="input"
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setP(e.target.value)}
+        />
 
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setU(e.target.value)}
-      />
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setP(e.target.value)}
-      />
+        {err && <div className="error">{err}</div>}
 
-      {err && <p className="text-red-600 text-sm">{err}</p>}
+        <button className="btn w-full" disabled={busy} onClick={submit}>
+          {busy ? "Signing in…" : "Login"}
+        </button>
 
-      <button
-        className="px-3 py-2 bg-black text-white rounded w-full"
-        disabled={busy}
-        onClick={submit}
-      >
-        {busy ? "Signing in…" : "Login"}
-      </button>
-
-      <p className="text-sm">
-        Don’t have an account?{" "}
-        <Link href="/register" className="underline">
-          Register
-        </Link>
-      </p>
+        <p className="text-sm mt-2">
+          Don’t have an account?{" "}
+          <Link href="/register" className="underline text-blue-700">
+            Register
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }

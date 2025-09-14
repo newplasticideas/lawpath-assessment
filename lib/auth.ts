@@ -29,7 +29,7 @@ export function setSessionCookie(res: NextResponse, token: string) {
     sameSite: "lax",
     path: "/",
     secure,
-    // expires: new Date(Date.now() + 1000*60*60*8),
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 8),
   });
 }
 

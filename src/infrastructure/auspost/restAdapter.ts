@@ -3,6 +3,7 @@ import {
   AddressValidation,
   AddressValidator,
 } from "../../core/ports";
+import { VALID_STATES } from "@/src/core/constants";
 
 export function makeAusPostRestAdapter(opts: {
   baseUrl: string;
@@ -11,7 +12,7 @@ export function makeAusPostRestAdapter(opts: {
 }): AddressValidator {
   const timeout = opts.timeoutMs ?? 5000;
 
-  async function call(path: string): Promise<any> {
+  async function call(path: string): Promise<Record<string, any>> {
     const ctrl = new AbortController();
     const id = setTimeout(() => ctrl.abort(), timeout);
     const url = `${opts.baseUrl}${path}`;
@@ -30,6 +31,15 @@ export function makeAusPostRestAdapter(opts: {
     }
   }
 
+  type AusPostLocality = {
+    location: string;
+    name: string;
+    state: string;
+    latitude: number;
+    longitude: number;
+    [key: string]: unknown;
+  };
+
   // You’ll need to adapt this to the *real* AusPost API response shape
   async function fetchLocalitiesByPostcode(
     postcode: string,
@@ -38,7 +48,7 @@ export function makeAusPostRestAdapter(opts: {
     Array<{
       suburb: string;
       state: string;
-      latLng: { lat: number; lng: number };
+      coordinates: { lat: number; lng: number };
     }>
   > {
     const params = [`q=${encodeURIComponent(postcode)}`];
@@ -61,30 +71,23 @@ export function makeAusPostRestAdapter(opts: {
         : [];
 
     return localityList
-      .map((locality: any) => ({
+      .map((locality: AusPostLocality) => ({
         suburb: locality?.location ?? locality?.name ?? "",
         state: locality?.state ?? "",
-        latLng: {
-          lat: parseFloat(locality?.latitude ?? "0"),
-          lng: parseFloat(locality?.longitude ?? "0"),
+        coordinates: {
+          lat: locality?.latitude || 0.0,
+          lng: locality?.longitude || 0.0,
         },
       }))
       .filter(
         (l) =>
-          l.suburb && l.state && !isNaN(l.latLng.lat) && !isNaN(l.latLng.lng),
+          l.suburb &&
+          l.state &&
+          !isNaN(l.coordinates.lat) &&
+          !isNaN(l.coordinates.lng),
       );
   }
 
-  const VALID_STATES = new Set([
-    "NSW",
-    "VIC",
-    "QLD",
-    "SA",
-    "WA",
-    "TAS",
-    "NT",
-    "ACT",
-  ]);
   const LONG_STATE: Record<string, string> = {
     NSW: "New South Wales",
     VIC: "Victoria",
@@ -106,12 +109,13 @@ export function makeAusPostRestAdapter(opts: {
         return { ok: false, message: "Postcode must be 4 digits." };
       if (!suburb.trim()) return { ok: false, message: "Suburb is required." };
       const S = state.toUpperCase();
-      if (!VALID_STATES.has(S)) return { ok: false, message: "Invalid state." };
+      if (!VALID_STATES.includes(S as (typeof VALID_STATES)[number]))
+        return { ok: false, message: "Invalid state." };
 
       let localities: Array<{
         suburb: string;
         state: string;
-        latLng: { lat: number; lng: number };
+        coordinates: { lat: number; lng: number };
       }>;
       try {
         localities = await fetchLocalitiesByPostcode(postcode);
@@ -125,7 +129,7 @@ export function makeAusPostRestAdapter(opts: {
       if (!match) {
         return {
           ok: false,
-          message: `The postcode ${postcode} does not match the suburb ${suburb}`,
+          message: `The postcode ${postcode} does not match the suburb ${suburb} in ${state}`,
         };
       }
       if (match.state.toUpperCase() !== S) {
@@ -137,8 +141,8 @@ export function makeAusPostRestAdapter(opts: {
 
       return {
         ok: true,
-        message: `${postcode}, ${suburb}, in ${state} is a valid match.`,
-        latLng: { lat: match.latLng.lat, lng: match.latLng.lng },
+        message: `${suburb}, ${state}, ${postcode} is a valid match.`,
+        coordinates: { lat: match.coordinates.lat, lng: match.coordinates.lng },
       };
     },
   };

@@ -5,7 +5,7 @@ import { makeExecutableSchema } from "@graphql-tools/schema";
  * Keep this tiny: just the pieces the app needs.
  */
 export const typeDefs = /* GraphQL */ `
-  type LatLng {
+  type Coordinates {
     lat: Float
     lng: Float
   }
@@ -13,7 +13,7 @@ export const typeDefs = /* GraphQL */ `
   type Validation {
     ok: Boolean!
     message: String!
-    latLng: LatLng
+    coordinates: Coordinates
   }
 
   type Query {
@@ -32,7 +32,7 @@ export function makeResolvers(
   ) => Promise<{
     ok: boolean;
     message: string;
-    latLng?: { lat: number; lng: number };
+    coordinates?: { lat: number; lng: number };
   }>,
 ) {
   return {
@@ -61,7 +61,7 @@ export function makeSchema(
   ) => Promise<{
     ok: boolean;
     message: string;
-    latLng?: { lat: number; lng: number };
+    coordinates?: { lat: number; lng: number };
   }>,
 ) {
   return makeExecutableSchema({

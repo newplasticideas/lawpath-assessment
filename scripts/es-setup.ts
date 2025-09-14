@@ -1,4 +1,3 @@
-// scripts/es-setup.ts
 import { Client } from "@elastic/elasticsearch";
 
 async function main() {
@@ -9,7 +8,7 @@ async function main() {
 
   const firstname = "Nick";
   const lastname = "Johnson";
-  const index = `${firstname.toLowerCase()}-${lastname.toLowerCase()}-index`;
+  const index = `${firstname.toLowerCase()}-${lastname.toLowerCase()}-verifications`;
 
   // Ensure index exists first (safe if it already exists)
   const exists = await client.indices.exists({ index });
@@ -18,19 +17,21 @@ async function main() {
     console.log("Created index:", index);
   }
 
-  // Update mapping with "semantic_text" (unknown to TS types)
+  // Update mapping for verification logs
   await client.indices.putMapping({
     index,
-    // The client expects body: { properties: ... } in v8
-    // Cast only the bit TS can't infer:
     body: {
       properties: {
-        text: { type: "semantic_text" } as any,
+        username: { type: "keyword" },
+        input: { type: "object" },
+        result: { type: "keyword" },
+        error: { type: "text" },
+        ts: { type: "date" },
       },
-    } as any,
+    },
   });
 
-  console.log(`Updated mapping on ${index} (text.semantic_text)`);
+  console.log(`Updated mapping on ${index} (verification log fields)`);
 }
 
 main().catch((err) => {

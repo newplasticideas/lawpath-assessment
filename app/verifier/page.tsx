@@ -5,13 +5,15 @@ import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
 import LogoutButton from "@/components/LogoutButton";
 import { GoogleMapView } from "@/components/GoogleMapView";
+import { VALID_STATES } from "@/src/core/constants";
+import { StateAbbr, Coordinates } from "@/src/core/types";
 
 const VALIDATE = gql`
   query Validate($postcode: String!, $suburb: String!, $state: String!) {
     validate(postcode: $postcode, suburb: $suburb, state: $state) {
       ok
       message
-      latLng {
+      coordinates {
         lat
         lng
       }
@@ -19,11 +21,11 @@ const VALIDATE = gql`
   }
 `;
 
-type Form = { postcode: string; suburb: string; state: string };
+type Form = { postcode: string; suburb: string; state: StateAbbr };
 type ValidateResult = {
   ok: boolean;
   message: string;
-  latLng: { lat: number; lng: number };
+  coordinates: Coordinates;
 };
 type ValidateQuery = { validate: ValidateResult };
 
@@ -58,58 +60,63 @@ export default function VerifierPage() {
   }
 
   return (
-    <main className="mx-auto max-w-lg p-6">
-      <header className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Address Verifier</h1>
-        <LogoutButton />
-      </header>
-
-      <form onSubmit={onSubmit} className="grid gap-3">
-        <input
-          className="border p-2"
-          placeholder="Postcode"
-          value={form.postcode}
-          onChange={(e) => set("postcode", e.target.value)}
-        />
-        <input
-          className="border p-2"
-          placeholder="Suburb"
-          value={form.suburb}
-          onChange={(e) => set("suburb", e.target.value)}
-        />
-        <select
-          className="border p-2"
-          value={form.state}
-          onChange={(e) => set("state", e.target.value)}
-        >
-          {["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"].map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <button disabled={loading} className="bg-black text-white p-2 rounded">
-          {loading ? "Validating..." : "Validate"}
-        </button>
-      </form>
-
-      <section className="mt-4">
-        {error && <p className="text-red-600">Network error</p>}
-        {data?.validate && (
-          <p className={data.validate.ok ? "text-green-700" : "text-red-700"}>
-            {data.validate.message}
-          </p>
-        )}
-      </section>
-      {data?.validate.ok && data.validate?.latLng && (
-        <section className="mt-6">
-          <h3>Location</h3>
-          <GoogleMapView
-            lat={data.validate.latLng.lat}
-            lng={data.validate.latLng.lng}
+    <main>
+      <div className="card">
+        <div className="header">Address Verifier</div>
+        <div className="flex justify-end mb-4">
+          <LogoutButton />
+        </div>
+        <form onSubmit={onSubmit} className="grid gap-3">
+          <input
+            className="input"
+            placeholder="Postcode"
+            value={form.postcode}
+            onChange={(e) => set("postcode", e.target.value)}
           />
+          <input
+            className="input"
+            placeholder="Suburb"
+            value={form.suburb}
+            onChange={(e) => set("suburb", e.target.value)}
+          />
+          <select
+            className="input"
+            value={form.state}
+            onChange={(e) => set("state", e.target.value)}
+          >
+            {VALID_STATES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <button disabled={loading} className="btn w-full">
+            {loading ? "Validating..." : "Validate"}
+          </button>
+          {loading && (
+            <div className="flex items-center gap-2 mt-4">
+              <span className="loader" />
+              <span>Validating address...</span>
+            </div>
+          )}
+        </form>
+        <section className="mt-4">
+          {error && <div className="error">Network error</div>}
+          {data?.validate && (
+            <div className={data.validate.ok ? "success" : "error"}>
+              {data.validate.message}
+            </div>
+          )}
         </section>
-      )}
+        {data?.validate.ok && data.validate?.coordinates && (
+          <section className="mt-6">
+            <GoogleMapView
+              lat={data.validate.coordinates.lat}
+              lng={data.validate.coordinates.lng}
+            />
+          </section>
+        )}
+      </div>
     </main>
   );
 }

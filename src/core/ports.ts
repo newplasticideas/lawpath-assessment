@@ -11,7 +11,7 @@ export type AddressInput = { postcode: string; suburb: string; state: string };
 export type AddressValidation = {
   ok: boolean;
   message: string;
-  latLng?: { lat: number; lng: number };
+  coordinates?: { lat: number; lng: number };
 };
 
 export interface UserRepository {
@@ -41,5 +41,5 @@ export interface PasswordHasher {
 export interface SessionIssuer {
   issue(username: string): Promise<string>;
   verify(token: string): Promise<{ username: string } | null>;
-  sign(claims: object, ttlSec?: number): string; // <-- Add this line
+  sign(claims: object, ttlSec?: number): string;
 }

@@ -1,4 +1,3 @@
-// app/register/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -24,7 +23,7 @@ export default function RegisterPage() {
     });
     if (!res.ok) {
       const j = (await res.json().catch(() => ({}))) as ApiError;
-      setErr(j.error ?? "Could not register");
+      setErr(j.error ?? "Registration failed");
       setBusy(false);
       return;
     }
@@ -32,39 +31,36 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="mx-auto max-w-sm p-6 space-y-3">
-      <h1 className="text-2xl font-semibold">Register</h1>
+    <main>
+      <div className="card">
+        <div className="header">Register</div>
+        <input
+          className="input"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setU(e.target.value)}
+        />
+        <input
+          className="input"
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setP(e.target.value)}
+        />
 
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Choose a username"
-        value={username}
-        onChange={(e) => setU(e.target.value)}
-      />
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Choose a password"
-        type="password"
-        value={password}
-        onChange={(e) => setP(e.target.value)}
-      />
+        {err && <div className="error">{err}</div>}
 
-      {err && <p className="text-red-600 text-sm">{err}</p>}
+        <button className="btn w-full" disabled={busy} onClick={submit}>
+          {busy ? "Registering…" : "Register"}
+        </button>
 
-      <button
-        className="px-3 py-2 bg-black text-white rounded w-full"
-        disabled={busy}
-        onClick={submit}
-      >
-        {busy ? "Creating account…" : "Create account"}
-      </button>
-
-      <p className="text-sm">
-        Already have an account?{" "}
-        <Link href="/login" className="underline">
-          Login
-        </Link>
-      </p>
+        <p className="text-sm mt-2">
+          Already have an account?{" "}
+          <Link href="/login" className="underline text-blue-700">
+            Login
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }

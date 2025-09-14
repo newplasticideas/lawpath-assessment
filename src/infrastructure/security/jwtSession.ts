@@ -1,27 +1,27 @@
-import jwt from "jsonwebtoken";
 import { SessionIssuer } from "../../core/ports";
+import { signSession, verifySession } from "@/lib/auth";
 
 /**
  * JWT-based implementation of SessionIssuer.
  * Issues & verifies tokens containing only the username.
  */
-export function jwtSession(secret: string): SessionIssuer {
+export function jwtSession(): SessionIssuer {
   return {
     async issue(username: string): Promise<string> {
-      return jwt.sign({ username }, secret, { expiresIn: "7d" });
+      return signSession({ sub: username, username: username }, 300);
     },
 
     async verify(token: string): Promise<{ username: string } | null> {
       try {
-        const payload = jwt.verify(token, secret) as { username: string };
+        const payload = verifySession(token);
         return { username: payload.username };
       } catch {
         return null;
       }
     },
 
-    sign(claims: object, ttlSec?: number): string {
-      return jwt.sign(claims, secret, { expiresIn: ttlSec ?? 60 * 60 * 8 });
+    sign(claims: { sub: string; username: string }, ttlSec?: number): string {
+      return signSession(claims, ttlSec ?? 300);
     },
   };
 }
