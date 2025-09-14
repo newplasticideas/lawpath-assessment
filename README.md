@@ -44,7 +44,7 @@ AUSPOST_BASE_URL="url-for-aus-post"
 AUSPOST_API_KEY="your-auspost-api-key"
 
 # Google Maps
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="your-google-maps-api-key"
+NEXT_GOOGLE_MAPS_API_KEY="your-google-maps-api-key"
 ```
 
 _(See `.env.local` in the repo for example values.)_

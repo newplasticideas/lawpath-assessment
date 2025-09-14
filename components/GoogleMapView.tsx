@@ -13,7 +13,7 @@ const containerStyle = {
 
 export function GoogleMapView({ lat, lng }: Props) {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey: process.env.NEXT_GOOGLE_MAPS_API_KEY || "",
   });
 
   if (!isLoaded) return <div>Loading map...</div>;
