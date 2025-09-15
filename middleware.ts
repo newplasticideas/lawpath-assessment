@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import { SESSION_COOKIE } from "@/src/core/constants";
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const token = req.cookies.get("lp_sess")?.value;
+  const token = req.cookies.get(SESSION_COOKIE)?.value;
   const secret = process.env.JWT_SECRET;
   let isValid = false;
 

@@ -2,12 +2,13 @@ import { NextRequest } from "next/server";
 import { graphql } from "graphql";
 import { composeServer } from "@/src/composition/server";
 import { makeSchema } from "./schema";
+import { SESSION_COOKIE } from "@/src/core/constants";
 
 async function getCtx(
   req: NextRequest,
   verifyToken: (t: string) => Promise<{ username: string } | null>,
 ) {
-  const token = req.cookies.get("lp_sess")?.value || "";
+  const token = req.cookies.get(SESSION_COOKIE)?.value || "";
   const session = await verifyToken(token);
   return { username: session?.username };
 }
