@@ -3,18 +3,15 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
-import { useLocalStorage } from "@/lib/localStorage";
 
 type ApiError = { error?: string };
 
 export default function RegisterPage() {
   const r = useRouter();
-  const [username, setU] = useState("");
-  const [password, setP] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-
-  const [formState, setFormState] = useLocalStorage("register_form", {});
 
   async function submit() {
     setBusy(true);
@@ -46,7 +43,7 @@ export default function RegisterPage() {
             className="input"
             placeholder="Username"
             value={username}
-            onChange={(e) => setU(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <label htmlFor="password" className="font-semibold text-sm mb-1">
             Password
@@ -57,7 +54,7 @@ export default function RegisterPage() {
             placeholder="Password"
             type="password"
             value={password}
-            onChange={(e) => setP(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           {err && <div className="error">{err}</div>}

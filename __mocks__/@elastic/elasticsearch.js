@@ -1,5 +1,3 @@
-// __mocks__/@elastic/elasticsearch.js
-
 const __store = {};
 
 function ensure(index) {

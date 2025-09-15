@@ -1,4 +1,3 @@
-// infrastructure/security/bcryptHasher.ts
 import bcrypt from "bcryptjs";
 
 /**

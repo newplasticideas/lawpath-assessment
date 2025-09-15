@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
 import LogoutButton from "@/components/LogoutButton";
@@ -110,10 +109,12 @@ export default function VerifierPage() {
         </section>
         {data?.validate.ok && data.validate?.coordinates && (
           <section className="mt-6">
-            <GoogleMapView
-              lat={data.validate.coordinates.lat}
-              lng={data.validate.coordinates.lng}
-            />
+            <div className="google-map-container">
+              <GoogleMapView
+                lat={data.validate.coordinates.lat}
+                lng={data.validate.coordinates.lng}
+              />
+            </div>
           </section>
         )}
       </div>

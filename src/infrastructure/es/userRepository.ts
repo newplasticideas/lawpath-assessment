@@ -2,9 +2,9 @@ import { User, UserRepository } from "../../core/ports";
 import { Client, errors as EsErrors } from "@elastic/elasticsearch";
 
 type EsRepoOpts = {
-  node: string; // e.g. https://<host>:9200
-  apiKey: string; // Elastic API key (Cloud or self-managed)
-  index: string; // e.g. "nick-johnson-users"
+  node: string;
+  apiKey: string;
+  index: string;
 };
 
 /**
@@ -21,7 +21,6 @@ export function esUserRepository(opts: EsRepoOpts): UserRepository {
   const client = new Client({ node: opts.node, auth: { apiKey: opts.apiKey } });
   const index = opts.index;
 
-  // Memoize index creation to avoid races on first boot
   let ensureIndexOnce: Promise<void> | null = null;
   async function ensureIndex(): Promise<void> {
     if (!ensureIndexOnce) {
@@ -34,7 +33,7 @@ export function esUserRepository(opts: EsRepoOpts): UserRepository {
             mappings: {
               properties: {
                 id: { type: "keyword" },
-                username: { type: "keyword" }, // exact-match search
+                username: { type: "keyword" },
                 passwordHash: { type: "keyword" },
                 createdAt: { type: "date" },
               },
@@ -42,7 +41,6 @@ export function esUserRepository(opts: EsRepoOpts): UserRepository {
           });
         }
       })().catch((e) => {
-        // Reset memoized promise so a later call can retry
         ensureIndexOnce = null;
         throw e;
       });
@@ -74,10 +72,8 @@ export function esUserRepository(opts: EsRepoOpts): UserRepository {
     async create(user: User): Promise<User> {
       await ensureIndex();
 
-      // Enforce unique username (fast path).
       const existing = await this.findByUsername(user.username);
       if (existing) {
-        // Surface as an application error; your route/usecase can map to 400.
         throw new Error("Username taken");
       }
 

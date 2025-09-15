@@ -1,4 +1,5 @@
 import { UserRepository } from "../core/ports";
+import { JWT_SHORT_TTL_SEC, ERR_USERNAME_TAKEN } from "../core/constants";
 
 type Deps = {
   users: UserRepository;
@@ -21,7 +22,7 @@ export function makeRegister({ users, hasher, session }: Deps) {
   }) => {
     const existing = await users.findByUsername(username);
     if (existing) {
-      return { ok: false as const, error: "Username taken" };
+      return { ok: false as const, error: ERR_USERNAME_TAKEN };
     }
 
     const passwordHash = await hasher.hash(password);
@@ -32,10 +33,10 @@ export function makeRegister({ users, hasher, session }: Deps) {
       createdAt: new Date().toISOString(),
     };
 
-    await users.create(user); // repo stores user object (no plaintext password!)
-    const token = session.sign(
+    await users.create(user);
+    const token = await session.sign(
       { sub: user.id, username: user.username },
-      60 * 60 * 8,
+      JWT_SHORT_TTL_SEC,
     );
     return {
       ok: true as const,

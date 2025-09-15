@@ -6,7 +6,6 @@ module.exports = {
   testMatch: ["**/__tests__/**/*.test.ts"],
   moduleFileExtensions: ["ts", "tsx", "js"],
   moduleNameMapper: {
-    // if you later add "@/..." aliases, map them here
     "^@/(.*)$": "<rootDir>/$1",
   },
   setupFiles: ["<rootDir>/jest.setup.js"],

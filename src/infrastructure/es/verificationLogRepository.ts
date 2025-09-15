@@ -13,7 +13,7 @@ function monthlyIndex(prefix: string, d = new Date()) {
 export function esVerificationLogRepository(opts: {
   node: string;
   apiKey: string;
-  prefix: string; // <- make prefix explicit
+  prefix: string;
 }): VerificationLogRepository {
   const client = new Client({ node: opts.node, auth: { apiKey: opts.apiKey } });
   const prefix = opts.prefix;

@@ -4,7 +4,6 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { useLocalStorage } from "@/lib/localStorage";
 
 export default async function RootPage() {
   const cookieStore = await cookies();
@@ -15,12 +14,4 @@ export default async function RootPage() {
   }
 
   redirect("/login");
-}
-
-// Example usage in a component:
-function ExampleComponent() {
-  // Instead of useState + useEffect with localStorage, use the hook:
-  const [myValue, setMyValue] = useLocalStorage("myKey", "");
-
-  // setMyValue("newValue") will persist to localStorage automatically
 }

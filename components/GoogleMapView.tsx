@@ -8,7 +8,7 @@ type Props = {
 
 const containerStyle = {
   width: "100%",
-  height: "400px", // was 300px
+  height: "400px",
 };
 
 export function GoogleMapView({ lat, lng }: Props) {
@@ -19,12 +19,14 @@ export function GoogleMapView({ lat, lng }: Props) {
   if (!isLoaded) return <div>Loading map...</div>;
 
   return (
-    <GoogleMap
-      mapContainerStyle={containerStyle}
-      center={{ lat, lng }}
-      zoom={15}
-    >
-      <Marker position={{ lat, lng }} />
-    </GoogleMap>
+    <div className="google-map-container">
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={{ lat, lng }}
+        zoom={15}
+      >
+        <Marker position={{ lat, lng }} />
+      </GoogleMap>
+    </div>
   );
 }

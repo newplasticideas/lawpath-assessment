@@ -4,8 +4,7 @@
 
 import { SignJWT, jwtVerify } from "jose";
 import { NextResponse } from "next/server";
-
-const COOKIE = "lp_sess";
+import { SESSION_COOKIE, JWT_SHORT_TTL_SEC } from "@/src/core/constants";
 
 /**
  * Signs a JWT session token with the given claims and TTL.
@@ -15,7 +14,7 @@ const COOKIE = "lp_sess";
  */
 export async function signSession(
   claims: { sub: string; username: string },
-  ttlSec = 60 * 60 * 8,
+  ttlSec = JWT_SHORT_TTL_SEC,
 ) {
   const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
   const jwt = await new SignJWT(claims)
@@ -49,13 +48,13 @@ export async function verifySession(token: string) {
 export function setSessionCookie(res: NextResponse, token: string) {
   const secure = process.env.NODE_ENV === "production";
   res.cookies.set({
-    name: COOKIE,
+    name: SESSION_COOKIE,
     value: token,
     httpOnly: true,
     sameSite: "lax",
     path: "/",
     secure,
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 8),
+    expires: new Date(Date.now() + JWT_SHORT_TTL_SEC),
   });
 }
 
@@ -64,5 +63,5 @@ export function setSessionCookie(res: NextResponse, token: string) {
  * @param res NextResponse object
  */
 export function clearSessionCookie(res: NextResponse) {
-  res.cookies.set({ name: COOKIE, value: "", path: "/", maxAge: 0 });
+  res.cookies.set({ name: SESSION_COOKIE, value: "", path: "/", maxAge: 0 });
 }

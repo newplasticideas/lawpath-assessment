@@ -3,14 +3,14 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
-import { useLocalStorage } from "@/lib/localStorage";
+import { ERR_INVALID_CREDENTIALS } from "@/src/core/constants";
 
 type ApiError = { error?: string };
 
 export default function LoginPage() {
   const r = useRouter();
-  const [username, setU] = useLocalStorage("login_username", "");
-  const [password, setP] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -24,7 +24,7 @@ export default function LoginPage() {
     });
     if (!res.ok) {
       const j = (await res.json().catch(() => ({}))) as ApiError;
-      setErr(j.error ?? "Invalid credentials");
+      setErr(j.error ?? ERR_INVALID_CREDENTIALS);
       setBusy(false);
       return;
     }
@@ -44,7 +44,7 @@ export default function LoginPage() {
             className="input"
             placeholder="Username"
             value={username}
-            onChange={(e) => setU(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <label htmlFor="password" className="font-semibold text-sm mb-1">
             Password
@@ -55,7 +55,7 @@ export default function LoginPage() {
             placeholder="Password"
             type="password"
             value={password}
-            onChange={(e) => setP(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           {err && <div className="error">{err}</div>}

@@ -14,12 +14,10 @@ export default function LogoutButton() {
   async function handleLogout() {
     setLoading(true);
     try {
-      // Call the API route
       await fetch("/api/auth/logout", { method: "POST" });
     } finally {
-      // Force navigation to login page
       router.push("/");
-      router.refresh(); // ensures middleware sees cookie cleared
+      router.refresh();
     }
   }
 

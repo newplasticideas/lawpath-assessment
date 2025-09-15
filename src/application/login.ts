@@ -1,4 +1,5 @@
-import { PasswordHasher, SessionIssuer, UserRepository } from "../core/ports";
+import { UserRepository } from "../core/ports";
+import { JWT_SHORT_TTL_SEC, ERR_INVALID_CREDENTIALS } from "../core/constants";
 
 type Deps = {
   users: UserRepository;
@@ -20,14 +21,14 @@ export function makeLogin({ users, hasher, session }: Deps) {
     password: string;
   }) => {
     const user = await users.findByUsername(username);
-    if (!user) return { ok: false as const, error: "Invalid credentials" };
+    if (!user) return { ok: false as const, error: ERR_INVALID_CREDENTIALS };
 
     const ok = await hasher.verify(password, user.passwordHash);
-    if (!ok) return { ok: false as const, error: "Invalid credentials" };
+    if (!ok) return { ok: false as const, error: ERR_INVALID_CREDENTIALS };
 
-    const token = session.sign(
+    const token = await session.sign(
       { sub: user.id, username: user.username },
-      60 * 60 * 8,
+      JWT_SHORT_TTL_SEC,
     );
     return {
       ok: true as const,
