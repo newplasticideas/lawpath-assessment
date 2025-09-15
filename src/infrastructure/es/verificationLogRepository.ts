@@ -1,6 +1,10 @@
 import { VerificationLogRepository } from "../../core/ports";
 import { Client } from "@elastic/elasticsearch";
 
+/**
+ * Elasticsearch-backed verification log repository implementation.
+ */
+
 function monthlyIndex(prefix: string, d = new Date()) {
   const m = `${d.getUTCFullYear()}.${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
   return `${prefix}-${m}`;

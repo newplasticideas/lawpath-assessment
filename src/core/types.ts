@@ -1,3 +1,7 @@
+/**
+ * Shared types used across the application.
+ */
+
 export type StateAbbr = (typeof import("./constants").VALID_STATES)[number];
 
 export type Coordinates = { lat: number; lng: number };

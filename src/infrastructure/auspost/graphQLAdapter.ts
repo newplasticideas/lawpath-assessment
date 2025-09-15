@@ -11,6 +11,9 @@ import {
 } from "@apollo/client/core";
 import fetch from "cross-fetch";
 
+/**
+ * Adapter for AusPost GraphQL address validation.
+ */
 export function makeAusPostGraphQLAdapter(opts: {
   endpoint: string;
   apiKey: string;

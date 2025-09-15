@@ -1,3 +1,5 @@
+/* Global styles for the Lawpath Assessment app */
+
 @import "tailwindcss";
 
 :root {
@@ -40,7 +42,7 @@ body {
     0 1.5px 6px rgba(0, 0, 0, 0.04);
   padding: 2em;
   margin: 2em auto;
-  max-width: 480px;
+  max-width: 700px; /* was 480px */
   transition: box-shadow 0.2s;
 }
 .card:hover {

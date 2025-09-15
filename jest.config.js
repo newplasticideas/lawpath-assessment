@@ -10,4 +10,8 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/$1",
   },
   setupFiles: ["<rootDir>/jest.setup.js"],
+  transform: {
+    "^.+\\.(ts|tsx|js)$": "ts-jest",
+  },
+  transformIgnorePatterns: ["/node_modules/(?!jose)/"],
 };

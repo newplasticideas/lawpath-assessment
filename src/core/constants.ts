@@ -1,3 +1,7 @@
+/**
+ * Core constants used throughout the application.
+ */
+
 export const VALID_STATES = [
   "NSW",
   "VIC",

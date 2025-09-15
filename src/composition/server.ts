@@ -22,53 +22,61 @@ import { esVerificationLogRepository } from "../infrastructure/es/verificationLo
 import { makeAusPostRestAdapter } from "../infrastructure/auspost/restAdapter";
 
 /**
- * Builds and returns all server-side services and use-cases.
- *
- * @returns {{
- *   session: ReturnType<typeof jwtSession>,
- *   hasher: ReturnType<typeof bcryptHasher>,
- *   users: ReturnType<typeof esUserRepository>,
- *   usecases: {
- *     register: ReturnType<typeof makeRegister>,
- *     login: ReturnType<typeof makeLogin>,
- *     verifyAddress: ReturnType<typeof makeVerifyAddress>
- *   }
- * }}
+ * Composes and configures the main server dependencies.
+ * @returns Server composition object
  */
-export function buildServerServices() {
-  const first = "nick";
-  const last = "johnson";
-  const USERS_INDEX = `${first}-${last}-users`;
-  const VERIF_PREFIX = `${first}-${last}-verifications`;
+export function composeServer() {
+  /**
+   * Builds and returns all server-side services and use-cases.
+   *
+   * @returns {{
+   *   session: ReturnType<typeof jwtSession>,
+   *   hasher: ReturnType<typeof bcryptHasher>,
+   *   users: ReturnType<typeof esUserRepository>,
+   *   usecases: {
+   *     register: ReturnType<typeof makeRegister>,
+   *     login: ReturnType<typeof makeLogin>,
+   *     verifyAddress: ReturnType<typeof makeVerifyAddress>
+   *   }
+   * }}
+   */
+  function buildServerServices() {
+    const first = "nick";
+    const last = "johnson";
+    const USERS_INDEX = `${first}-${last}-users`;
+    const VERIF_PREFIX = `${first}-${last}-verifications`;
 
-  const users = esUserRepository({
-    node: process.env.ELASTICSEARCH_NODE!,
-    apiKey: process.env.ELASTICSEARCH_API_KEY!,
-    index: USERS_INDEX,
-  });
+    const users = esUserRepository({
+      node: process.env.ELASTICSEARCH_NODE!,
+      apiKey: process.env.ELASTICSEARCH_API_KEY!,
+      index: USERS_INDEX,
+    });
 
-  const logs = esVerificationLogRepository({
-    node: process.env.ELASTICSEARCH_NODE!,
-    apiKey: process.env.ELASTICSEARCH_API_KEY!,
-    prefix: VERIF_PREFIX,
-  });
+    const logs = esVerificationLogRepository({
+      node: process.env.ELASTICSEARCH_NODE!,
+      apiKey: process.env.ELASTICSEARCH_API_KEY!,
+      prefix: VERIF_PREFIX,
+    });
 
-  const validator = makeAusPostRestAdapter({
-    baseUrl: process.env.AUSPOST_BASE_URL!,
-    apiKey: process.env.AUSPOST_API_KEY!,
-  });
+    const validator = makeAusPostRestAdapter({
+      baseUrl: process.env.AUSPOST_BASE_URL!,
+      apiKey: process.env.AUSPOST_API_KEY!,
+    });
 
-  const session = jwtSession();
-  const hasher = bcryptHasher();
+    const session = jwtSession();
+    const hasher = bcryptHasher();
 
-  return {
-    session,
-    hasher,
-    users,
-    usecases: {
-      register: makeRegister({ users, hasher, session }),
-      login: makeLogin({ users, hasher, session }),
-      verifyAddress: makeVerifyAddress({ validator, logs }),
-    },
-  };
+    return {
+      session,
+      hasher,
+      users,
+      usecases: {
+        register: makeRegister({ users, hasher, session }),
+        login: makeLogin({ users, hasher, session }),
+        verifyAddress: makeVerifyAddress({ validator, logs }),
+      },
+    };
+  }
+
+  return buildServerServices();
 }

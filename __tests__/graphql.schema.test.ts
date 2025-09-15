@@ -19,14 +19,14 @@ describe("GraphQL validate schema", () => {
   const schema = makeSchema(fakeVerify);
 
   it("returns validation error message", async () => {
-    const query = `query($pc:String!,$s:String!,$st:String!){
-      validate(postcode:$pc, suburb:$s, state:$st){ ok message }
+    const query = `query Validate($postcode: String!, $suburb: String!, $state: String!){
+      validate(postcode: $postcode, suburb: $suburb, state: $state){ ok message }
     }`;
 
     const res = (await graphql({
       schema,
       source: query,
-      variableValues: { pc: "12", s: "Sydney", st: "NSW" },
+      variableValues: { postcode: "12", suburb: "Sydney", state: "NSW" },
       contextValue: { username: "alice" },
     })) as ExecutionResult<ValidateResult>;
 

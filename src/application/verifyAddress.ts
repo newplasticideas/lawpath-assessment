@@ -5,6 +5,11 @@ import {
 } from "../core/ports";
 import { AddressValidation } from "../core/types";
 
+/**
+ * Creates a verifyAddress use-case handler.
+ * @param deps - Dependencies: validator and logs repo
+ * @returns Function to verify address and log attempt
+ */
 export function makeVerifyAddress(deps: {
   validator: AddressValidator;
   logs: VerificationLogRepository;
@@ -24,3 +29,15 @@ export function makeVerifyAddress(deps: {
     return result;
   };
 }
+
+/**
+ * Verifies an address and logs the attempt.
+ * @param username - User performing verification
+ * @param address - Address details
+ * @returns Result object with ok and message
+ */
+export type VerifyAddressParams = {
+  postcode: string;
+  suburb: string;
+  state: string;
+};

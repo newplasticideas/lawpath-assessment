@@ -6,6 +6,11 @@ type Deps = {
   session: { sign(claims: object, ttlSec?: number): Promise<string> };
 };
 
+/**
+ * Creates a register use-case handler.
+ * @param deps - Dependencies: users repo, hasher, session
+ * @returns Function to perform registration
+ */
 export function makeRegister({ users, hasher, session }: Deps) {
   return async ({
     username,
@@ -39,3 +44,13 @@ export function makeRegister({ users, hasher, session }: Deps) {
     };
   };
 }
+
+/**
+ * Attempts to register a new user.
+ * @param params - Registration parameters
+ * @returns Result object with ok, token, or error
+ */
+export type RegisterParams = {
+  username: string;
+  password: string;
+};

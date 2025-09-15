@@ -1,5 +1,9 @@
+/**
+ * API route handler for user registration.
+ */
+
 import { NextResponse } from "next/server";
-import { buildServerServices } from "@/src/composition/server";
+import { composeServer } from "@/src/composition/server";
 import { setSessionCookie } from "@/lib/auth";
 
 export async function POST(req: Request) {
@@ -11,7 +15,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const { usecases } = buildServerServices();
+  const { usecases } = composeServer();
   const result = await usecases.register({ username, password });
 
   if (!result.ok)

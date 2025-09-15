@@ -1,3 +1,7 @@
+/**
+ * Script for setting up Elasticsearch indices for the Lawpath Assessment app.
+ */
+
 import { Client } from "@elastic/elasticsearch";
 
 async function main() {

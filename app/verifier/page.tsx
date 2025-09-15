@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
 import LogoutButton from "@/components/LogoutButton";
 import { GoogleMapView } from "@/components/GoogleMapView";
 import { VALID_STATES } from "@/src/core/constants";
 import { StateAbbr, Coordinates } from "@/src/core/types";
+import { useLocalStorage } from "@/lib/localStorage";
 
 const VALIDATE = gql`
   query Validate($postcode: String!, $suburb: String!, $state: String!) {
@@ -29,26 +30,13 @@ type ValidateResult = {
 };
 type ValidateQuery = { validate: ValidateResult };
 
-const STORAGE_KEY = "verifierForm";
-
 export default function VerifierPage() {
-  const [form, setForm] = useState<Form>({
+  const [form, setForm] = useLocalStorage<Form>("verifierForm", {
     postcode: "",
     suburb: "",
     state: "NSW",
   });
   const [run, { data, loading, error }] = useLazyQuery<ValidateQuery>(VALIDATE);
-
-  // Restore form state from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) setForm(JSON.parse(saved));
-  }, []);
-
-  // Persist form state to localStorage
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
-  }, [form]);
 
   function set<K extends keyof Form>(k: K, v: string) {
     setForm((prev) => ({ ...prev, [k]: v }));
@@ -67,19 +55,31 @@ export default function VerifierPage() {
           <LogoutButton />
         </div>
         <form onSubmit={onSubmit} className="grid gap-3">
+          <label htmlFor="postcode" className="font-semibold text-sm mb-1">
+            Postcode
+          </label>
           <input
+            id="postcode"
             className="input"
             placeholder="Postcode"
             value={form.postcode}
             onChange={(e) => set("postcode", e.target.value)}
           />
+          <label htmlFor="suburb" className="font-semibold text-sm mb-1">
+            Suburb
+          </label>
           <input
+            id="suburb"
             className="input"
             placeholder="Suburb"
             value={form.suburb}
             onChange={(e) => set("suburb", e.target.value)}
           />
+          <label htmlFor="state" className="font-semibold text-sm mb-1">
+            State
+          </label>
           <select
+            id="state"
             className="input"
             value={form.state}
             onChange={(e) => set("state", e.target.value)}

@@ -1,3 +1,7 @@
+/**
+ * Authentication utility functions for the Lawpath Assessment app.
+ */
+
 import { SignJWT, jwtVerify } from "jose";
 import { NextResponse } from "next/server";
 

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { graphql } from "graphql";
-import { buildServerServices } from "@/src/composition/server"; // if you didn't set TS path alias, use ../../../../src/composition/server
+import { composeServer } from "@/src/composition/server";
 import { makeSchema } from "./schema";
 
 async function getCtx(
@@ -14,7 +14,7 @@ async function getCtx(
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { usecases, session } = buildServerServices();
+  const { usecases, session } = composeServer();
   const schema = makeSchema(usecases.verifyAddress);
   const contextValue = {
     ...(await getCtx(req, session.verify)),
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const query = url.searchParams.get("query") || "";
   const variables = JSON.parse(url.searchParams.get("variables") || "{}");
-  const { usecases, session } = buildServerServices();
+  const { usecases, session } = composeServer();
   const schema = makeSchema(usecases.verifyAddress);
   const contextValue = {
     ...(await getCtx(req, session.verify)),

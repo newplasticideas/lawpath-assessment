@@ -1,9 +1,13 @@
+/**
+ * API route handler for user login.
+ */
+
 import { NextResponse } from "next/server";
-import { buildServerServices } from "@/src/composition/server";
+import { composeServer } from "@/src/composition/server";
 import { setSessionCookie } from "@/lib/auth";
 export async function POST(req: Request) {
   const { username, password } = await req.json();
-  const { usecases } = buildServerServices();
+  const { usecases } = composeServer();
 
   const result = await usecases.login({ username, password });
   if (!result.ok)

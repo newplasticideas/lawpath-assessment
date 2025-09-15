@@ -1,3 +1,7 @@
+/**
+ * Adapter for AusPost REST address validation.
+ */
+
 import {
   AddressInput,
   AddressValidation,
@@ -40,7 +44,6 @@ export function makeAusPostRestAdapter(opts: {
     [key: string]: unknown;
   };
 
-  // You’ll need to adapt this to the *real* AusPost API response shape
   async function fetchLocalitiesByPostcode(
     postcode: string,
     state?: string,
@@ -127,6 +130,7 @@ export function makeAusPostRestAdapter(opts: {
         (l) => l.suburb.toLowerCase() === suburb.toLowerCase(),
       );
       if (!match) {
+        console.log("No suburb match", { localities, postcode, suburb, state });
         return {
           ok: false,
           message: `The postcode ${postcode} does not match the suburb ${suburb} in ${state}`,

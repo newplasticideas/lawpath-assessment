@@ -6,6 +6,11 @@ type Deps = {
   session: { sign(claims: object, ttlSec?: number): Promise<string> };
 };
 
+/**
+ * Creates a login use-case handler.
+ * @param deps - Dependencies: users repo, hasher, session
+ * @returns Function to perform login
+ */
 export function makeLogin({ users, hasher, session }: Deps) {
   return async ({
     username,
@@ -31,3 +36,13 @@ export function makeLogin({ users, hasher, session }: Deps) {
     };
   };
 }
+
+/**
+ * Attempts to log in a user.
+ * @param params - Login parameters
+ * @returns Result object with ok, token, or error
+ */
+export type LoginParams = {
+  username: string;
+  password: string;
+};

@@ -1,3 +1,7 @@
+/**
+ * Application ports/interfaces for dependency injection.
+ */
+
 export type Username = string;
 
 export type User = {
@@ -14,11 +18,16 @@ export type AddressValidation = {
   coordinates?: { lat: number; lng: number };
 };
 
-export interface UserRepository {
-  findByUsername(username: Username): Promise<User | null>;
-  create(user: User): Promise<User>;
+/**
+ * Interface for address validation.
+ */
+export interface AddressValidator {
+  validate(input: AddressInput): Promise<AddressValidation>;
 }
 
+/**
+ * Interface for logging verification attempts.
+ */
 export interface VerificationLogRepository {
   log(entry: {
     username: Username;
@@ -29,8 +38,12 @@ export interface VerificationLogRepository {
   }): Promise<void>;
 }
 
-export interface AddressValidator {
-  validate(input: AddressInput): Promise<AddressValidation>;
+/**
+ * Interface for user repository.
+ */
+export interface UserRepository {
+  findByUsername(username: Username): Promise<User | null>;
+  create(user: User): Promise<User>;
 }
 
 export interface PasswordHasher {

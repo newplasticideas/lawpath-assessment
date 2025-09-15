@@ -8,7 +8,7 @@ type EsRepoOpts = {
 };
 
 /**
- * Elasticsearch-backed UserRepository (no in-memory fallback).
+ * Elasticsearch-backed user repository implementation.
  * - Ensures index exists with keyword mappings.
  * - findByUsername() uses a term query on keyword field.
  * - create() returns the stored user and enforces unique username.

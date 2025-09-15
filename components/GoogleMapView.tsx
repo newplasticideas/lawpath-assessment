@@ -8,7 +8,7 @@ type Props = {
 
 const containerStyle = {
   width: "100%",
-  height: "300px",
+  height: "400px", // was 300px
 };
 
 export function GoogleMapView({ lat, lng }: Props) {
