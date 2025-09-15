@@ -41,5 +41,5 @@ export interface PasswordHasher {
 export interface SessionIssuer {
   issue(username: string): Promise<string>;
   verify(token: string): Promise<{ username: string } | null>;
-  sign(claims: object, ttlSec?: number): string;
+  sign(claims: object, ttlSec?: number): Promise<string>;
 }

@@ -3,7 +3,7 @@ import { PasswordHasher, SessionIssuer, UserRepository } from "../core/ports";
 type Deps = {
   users: UserRepository;
   hasher: { verify(pwd: string, hash: string): Promise<boolean> };
-  session: { sign(claims: object, ttlSec?: number): string };
+  session: { sign(claims: object, ttlSec?: number): Promise<string> };
 };
 
 export function makeLogin({ users, hasher, session }: Deps) {

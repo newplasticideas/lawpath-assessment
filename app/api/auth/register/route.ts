@@ -18,6 +18,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: result.error }, { status: 400 });
 
   const res = NextResponse.json({ ok: true });
-  setSessionCookie(res, result.token);
+  setSessionCookie(res, await result.token);
   return res;
 }

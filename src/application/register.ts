@@ -3,7 +3,7 @@ import { UserRepository } from "../core/ports";
 type Deps = {
   users: UserRepository;
   hasher: { hash(pwd: string): Promise<string> };
-  session: { sign(claims: object, ttlSec?: number): string };
+  session: { sign(claims: object, ttlSec?: number): Promise<string> };
 };
 
 export function makeRegister({ users, hasher, session }: Deps) {

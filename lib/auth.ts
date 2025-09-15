@@ -1,26 +1,48 @@
-// lib/auth.ts
-import jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify } from "jose";
 import { NextResponse } from "next/server";
 
 const COOKIE = "lp_sess";
 
-export function signSession(
+/**
+ * Signs a JWT session token with the given claims and TTL.
+ * @param claims JWT claims (sub, username)
+ * @param ttlSec Time-to-live in seconds (default: 8 hours)
+ * @returns Signed JWT string
+ */
+export async function signSession(
   claims: { sub: string; username: string },
   ttlSec = 60 * 60 * 8,
 ) {
-  return jwt.sign(claims, process.env.JWT_SECRET!, { expiresIn: ttlSec });
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+  const jwt = await new SignJWT(claims)
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(claims.sub)
+    .setExpirationTime(`${ttlSec}s`)
+    .sign(secret);
+  return jwt;
 }
 
-export function verifySession(token: string) {
-  return jwt.verify(token, process.env.JWT_SECRET!) as {
+/**
+ * Verifies a JWT session token and returns its payload.
+ * @param token JWT string
+ * @returns Decoded claims (sub, username, exp)
+ */
+export async function verifySession(token: string) {
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+  const { payload } = await jwtVerify(token, secret);
+  return payload as {
     sub: string;
     username: string;
     exp: number;
   };
 }
 
+/**
+ * Sets the session cookie on the response.
+ * @param res NextResponse object
+ * @param token JWT string
+ */
 export function setSessionCookie(res: NextResponse, token: string) {
-  // In dev, allow non-HTTPS so the cookie actually sets.
   const secure = process.env.NODE_ENV === "production";
   res.cookies.set({
     name: COOKIE,
@@ -33,6 +55,10 @@ export function setSessionCookie(res: NextResponse, token: string) {
   });
 }
 
+/**
+ * Clears the session cookie on the response.
+ * @param res NextResponse object
+ */
 export function clearSessionCookie(res: NextResponse) {
   res.cookies.set({ name: COOKIE, value: "", path: "/", maxAge: 0 });
 }
