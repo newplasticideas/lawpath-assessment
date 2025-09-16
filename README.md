@@ -7,8 +7,7 @@ A full-stack Next.js application for user registration, login, and Australian ad
 ## 🚀 Deployed App
 
 **Live URL:**
-[https://lawpath-assessment.vercel.app](https://lawpath-assessment.vercel.app)
-_(Replace with your actual Vercel deployment URL)_
+[https://naj-lawpath-assessment.vercel.app](https://naj-lawpath-assessment.vercel.app)
 
 ---
 
@@ -46,8 +45,6 @@ AUSPOST_API_KEY="your-auspost-api-key"
 # Google Maps
 NEXT_GOOGLE_MAPS_API_KEY="your-google-maps-api-key"
 ```
-
-_(See `.env.local` in the repo for example values.)_
 
 ### 4. Start Elasticsearch (Local Dev)
 
@@ -94,26 +91,6 @@ pnpm test --coverage
 - Responsive, accessible UI
 - LocalStorage persistence for form state
 - Logout functionality
-
----
-
-## 🖥️ Vercel Deployment
-
-1. Push your code to GitHub.
-2. Import the repo in [Vercel](https://vercel.com).
-3. Set environment variables in Vercel dashboard (Settings > Environment Variables).
-4. Deploy!
-
----
-
-## 📚 Additional Notes
-
-- **Elasticsearch:**
-  For production, use the provided remote ES URL and API key.
-- **AusPost API:**
-  You must supply your own API key for AusPost.
-- **Google Maps:**
-  You must supply your own Google Maps API key.
 
 ---
 
